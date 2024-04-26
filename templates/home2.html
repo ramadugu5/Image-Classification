@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Camera & Mic Access Testing </title>
+    <style>
+        /* Add your custom styles here */
+        .icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-color: #ccc;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 20px;
+            font-size: 14px;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Camera & Mic Access Testing</h1>
+
+    <!--<div class='container '>
+        <div class='row m-2 p-2 '>
+            <div class= 'card'>
+
+                <div class="icon" id="camera-icon">
+                    <i class="fa fa-microphone"></i>
+                    
+                    <button id="startAudioBtn" onclick="startAudioRecording()">Start Audio Recording</button>
+                </div>
+            
+            
+                <div class="icon" id="camera-icon">
+                    <i class="fa fa-microphone-slash"></i>
+                    <button id="stopAudioBtn" onclick="stopAudioRecording()">Stop Audio Recording</button>
+                </div>
+
+                <div class='mt-2 p-2'><audio id="audioPreview" controls></audio></div>
+            </div>
+        </div>
+    </div>
+    <div class='container mt-3 p-2'>
+
+        <div class='row'>
+            <div class='col-4'>
+
+                <div class="icon" id="camera-icon">
+                    <i class="fa fa-camera"></i>
+                    <button id="startVideoBtn" onclick="startVideoRecording()">Start Video Recording</button>
+                
+                </div>
+                <div class="icon col-4" id="camera-icon">
+                    <i class="fa fa-camera-slash"></i>
+                    <button id="stopVideoBtn" onclick="stopVideoRecording()">Stop Video Recording</button>        
+                </div>
+                
+                <div class='col-4'>
+                    <video id="videoPreview" width="400" height="300" controls></video>
+                </div>
+            </div>
+        </div>
+    </div>-->
+
+    <div class="container">
+        <div class="row">
+            <div class='col-4 d-flex'>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fa fa-microphone"></i></h5>
+                            <button id="startAudioBtn" onclick="startAudioRecording()">Start Audio Recording</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fa fa-microphone-slash"></i></h5>
+                            <button id="stopAudioBtn" onclick="stopAudioRecording()">Stop Audio Recording</button>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            <div class='mt-2 p-2'><audio id="audioPreview" controls></audio></div>
+            <div class='col-4 d-flex'>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fa fa-camera"></i></h5>
+                            <button id="startVideoBtn" onclick="startVideoRecording()">Start Video Recording</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fa-solid fa-camera"></i></h5>
+                            <button id="stopVideoBtn" onclick="stopVideoRecording()">Stop Video Recording</button> 
+                        </div>
+                    </div>
+                </div>
+               
+            </div>
+            <div class='col-4 d-flex'>
+                <video id="videoPreview" width="400" height="300" controls></video>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="./test.js"></script>
+
+
+
+
+    <script src="recording.js"></script>
+
+    <!--<script>
+        // Add your JavaScript code here
+
+        // Camera functionality
+        const cameraIcon = document.getElementById('camera-icon');
+
+        cameraIcon.addEventListener('click', function () {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function (stream) {
+                    const video = document.createElement('video');
+                    video.srcObject = stream;
+                    video.autoplay = true;
+
+                    // Add the video stream to the page
+                    document.body.appendChild(video);
+                })
+                .catch(function (error) {
+                    console.error('Error accessing camera:', error);
+                });
+        });
+
+        // Microphone functionality
+        const micIcon = document.getElementById('mic-icon');
+
+        micIcon.addEventListener('click', function () {
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(function (stream) {
+                    const audio = document.createElement('audio');
+                    audio.srcObject = stream;
+                    audio.autoplay = true;
+
+                    // Add the audio stream to the page
+                    document.body.appendChild(audio);
+                })
+                .catch(function (error) {
+                    console.error('Error accessing microphone:', error);
+                });
+        });
+    </script>
+
+    <script>
+        let mediaRecorder;
+        let recordedChunks = [];
+
+        function startRecording() {
+            navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+                .then(function (stream) {
+                    const videoPreview = document.getElementById('videoPreview');
+                    videoPreview.srcObject = stream;
+                    videoPreview.play();
+
+                    recordedChunks = [];
+                    mediaRecorder = new MediaRecorder(stream);
+
+                    mediaRecorder.ondataavailable = function (event) {
+                        if (event.data.size > 0) {
+                            recordedChunks.push(event.data);
+                        }
+                    };
+
+                    mediaRecorder.start();
+                })
+                .catch(function (error) {
+                    console.error('Error accessing media devices:', error);
+                });
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+
+                const videoPreview = document.getElementById('videoPreview');
+                videoPreview.srcObject = null;
+
+                const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'recording.webm';
+                a.click();
+
+                recordedChunks = [];
+                mediaRecorder = null;
+            }
+        }
+
+
+</script>-->
+
+
+<script>
+    let audioRecorder;
+    let audioChunks = [];
+
+    function startAudioRecording() {
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(function (stream) {
+                const audioPreview = document.getElementById('audioPreview');
+                audioPreview.srcObject = stream;
+                audioPreview.play();
+
+                audioChunks = [];
+                audioRecorder = new MediaRecorder(stream);
+
+                audioRecorder.ondataavailable = function (event) {
+                    if (event.data.size > 0) {
+                        audioChunks.push(event.data);
+                    }
+                };
+
+                audioRecorder.start();
+            })
+            .catch(function (error) {
+                console.error('Error accessing audio devices:', error);
+            });
+    }
+
+    function stopAudioRecording() {
+        if (audioRecorder && audioRecorder.state !== 'inactive') {
+            audioRecorder.stop();
+
+            const audioPreview = document.getElementById('audioPreview');
+            audioPreview.srcObject = null;
+
+            const blob = new Blob(audioChunks, { type: 'audio/webm' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'audio_recording.webm';
+            a.click();
+
+            audioChunks = [];
+            audioRecorder = null;
+        }
+    }
+
+    let videoRecorder;
+    let videoChunks = [];
+
+    function startVideoRecording() {
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function (stream) {
+                const videoPreview = document.getElementById('videoPreview');
+                videoPreview.srcObject = stream;
+                videoPreview.play();
+
+                videoChunks = [];
+                videoRecorder = new MediaRecorder(stream);
+
+                videoRecorder.ondataavailable = function (event) {
+                    if (event.data.size > 0) {
+                        videoChunks.push(event.data);
+                    }
+                };
+
+                videoRecorder.start();
+            })
+            .catch(function (error) {
+                console.error('Error accessing video devices:', error);
+            });
+    }
+
+    function stopVideoRecording() {
+        if (videoRecorder && videoRecorder.state !== 'inactive') {
+            videoRecorder.stop();
+
+            const videoPreview = document.getElementById('videoPreview');
+            videoPreview.srcObject = null;
+
+            const blob = new Blob(videoChunks, { type: 'video/webm' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'video_recording.webm';
+            a.click();
+
+            videoChunks = [];
+            videoRecorder = null;
+        }
+    }
+    
+</script>
+</body>
+</html>

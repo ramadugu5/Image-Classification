@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile App Dashboard</title>
+    <style>
+        /* Add your custom styles here */
+    </style>
+</head>
+<body>
+    <header>
+        <!-- Add your header content here -->
+    </header>
+
+    <main>
+        <div id="camera-container">
+            <video id="video-element" autoplay></video>
+            <button id="capture-button">Capture Photo</button>
+        </div>
+
+        <div id="microphone-container">
+            <button id="start-recording-button">Start Recording</button>
+            <button id="stop-recording-button">Stop Recording</button>
+        </div>
+
+        <form action="/record" method="post" enctype="multipart/form-data">
+            <input type="file" name="camera" accept="image/*">
+            <input type="file" name="audio" accept="audio/*">
+            <input type="submit" value="Record">
+        </form>
+        
+
+        <!-- Add your other dashboard content here -->
+    </main>
+
+    <footer>
+        <!-- Add your footer content here -->
+    </footer>
+
+    <script>
+        // Add your JavaScript code here
+
+        // Video camera functionality
+        const videoElement = document.getElementById('video-element');
+        const captureButton = document.getElementById('capture-button');
+
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function (stream) {
+                videoElement.srcObject = stream;
+            })
+            .catch(function (error) {
+                console.error('Error accessing video camera:', error);
+            });
+
+        captureButton.addEventListener('click', function () {
+            const canvas = document.createElement('canvas');
+            canvas.width = videoElement.videoWidth;
+            canvas.height = videoElement.videoHeight;
+            const context = canvas.getContext('2d');
+            context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+
+            // Do something with the captured photo (e.g., send it to the server)
+            const imageDataURL = canvas.toDataURL('image/png');
+            console.log('Captured photo:', imageDataURL);
+        });
+
+        // Microphone functionality
+        const startRecordingButton = document.getElementById('start-recording-button');
+        const stopRecordingButton = document.getElementById('stop-recording-button');
+
+        let mediaRecorder;
+        let recordedChunks = [];
+
+        startRecordingButton.addEventListener('click', function () {
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(function (stream) {
+                    mediaRecorder = new MediaRecorder(stream);
+
+                    mediaRecorder.addEventListener('dataavailable', function (event) {
+                        if (event.data.size > 0) {
+                            recordedChunks.push(event.data);
+                        }
+                    });
+
+                    mediaRecorder.start();
+                })
+                .catch(function (error) {
+                    console.error('Error accessing microphone:', error);
+                });
+        });
+
+        stopRecordingButton.addEventListener('click', function () {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+
+                mediaRecorder.addEventListener('stop', function () {
+                    const audioBlob = new Blob(recordedChunks, { type: 'audio/webm' });
+
+                    // Do something with the recorded audio (e.g., send it to the server)
+                    console.log('Recorded audio:', audioBlob);
+
+                    recordedChunks = [];
+                });
+            }
+        });
+    </script>
+</body>
+</html>
